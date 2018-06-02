@@ -74,17 +74,18 @@ void rozwiaz_laasonen_SOR();
     void AlgorytmThomasa_macierz(double *nadDiag, double *Diag, double *podDiag, int n);
 
     void save_gnuplot2(double **roz,string nazwa, string rozsz);
-    void save_gnuplot3(double **roz,string nazwa, string rozsz);
+    void save_gnuplot_ogolne(double **roz,string nazwa, string rozsz);
     void SOR(double **A, double *B, double *X0, int n);
 
     double max(double *x, int n, double **A, double *b);
 
     double Estymator(double *x0, double *x1, int n);
-    void f_blad ();
 
-    void zapis_do_pliku_w(char *nazwa, double *wektor);
 
-    void saveA(double **roz, string nazwa);
+
+    void save_macierz(double **roz, string nazwa);
+
+    void maxb(double **roz,  double *tablica, double *tablica2, int i);
 };
 
 

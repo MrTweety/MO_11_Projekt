@@ -133,7 +133,7 @@ void Projekt::rozwiaz_analityczne()
 
 
 void Projekt::rozwiaz_laasonen_thomasa(){
-    cout<<"rozwiaz_laasonen_thomasa():"<<endl;
+    cout<<"rozwiaz_laasonen_thomasa:"<<endl;
     double *nadDiag = new double[ile_x-1];
     double *Diag = new double[ile_x];
     double *podDiag = new double[ile_x-1];
@@ -186,8 +186,9 @@ void Projekt::rozwiaz_laasonen_thomasa(){
     if(zapis) {
         save_gnuplot(rozwiazanieT, "rozwT.txt");
         save_gnuplot2(rozwiazanieT, "rozwT", ".txt");
+        blad_bezwgl(blad_T,rozwiazanieT,blad_max_T,"bladT");
     }
-    blad_bezwgl(blad_T,rozwiazanieT,blad_max_T,"bladT");
+
 }
 
 
@@ -222,6 +223,7 @@ void Projekt::AlgorytmThomasa_rozwiazanie(double *nadDiag, double *Diag, double 
 }
 
 void Projekt::rozwiaz_laasonen_SOR(){
+    cout<<"rozwiaz_laasonen_SOR:"<<endl;
     double x;
     double *b = new double[ile_x];
    // double *wyn = new double[ile_x];
@@ -286,9 +288,10 @@ void Projekt::rozwiaz_laasonen_SOR(){
     if(zapis) {
         save_gnuplot(rozwiazanieSOR, "rozwSOR.txt");
         save_gnuplot2(rozwiazanieSOR, "rozwSOR", ".txt");
+        blad_bezwgl(blad_SOR,rozwiazanieSOR,blad_max_SOR,"bladSOR");
     }
 
-    blad_bezwgl(blad_SOR,rozwiazanieSOR,blad_max_SOR,"bladSOR");
+
 }
 
 
@@ -524,152 +527,55 @@ void Projekt::save_gnuplot2(double **roz, string nazwa, string rozsz )
 
 
 
-void Projekt::f_blad ()
-{
-    double *blad_max = new double[ile_t];
-
-    dt =  h*h*lambda / D;
-    ile_t = static_cast<int> ( (t_max/dt) + 1 );
-    double   x =  x_min,t = 0;
-    for (int j = 0; j < ile_t; j++)
-    {
-        for (int i = 0; i < ile_x ; i++)
-        {
-            blad_SOR[i][j]=fabs(rozwiazanieA[i][j] - rozwiazanieT[i][j]);
-            if (blad_SOR[i][j]>blad_max[j]) blad_max[j] = blad_SOR[i][j]; //blad bezwzgledny
-            x=x+h;
-        }
-        t=t+dt;
-        x =  x_min;
-    }
-    // zapis_do_pliku_m ("blad_bezwzgledny_dla_laasonen.txt", blad);
-    zapis_do_pliku_w ("blad_max_dla_laasonen.txt", blad_max);
-}
-
-
-void Projekt::zapis_do_pliku_w (char* nazwa, double* wektor)
-{
-    ofstream file( nazwa );
-    double t = 0;
-    //file<<nazwa<<", dt =  "<<dt<<endl<<endl;
-    for (int j = 0; j < ile_t; j++)
-    {
-        //file<<"Dla poziomu czasowego = "<<t<<"\t blad_max = "<<wektor[j]<<endl;
-        file<<t<<"\t "<<log10(wektor[j])<<endl;
-
-        t = t+dt;
-    }
-    file.close();
-}
-
-
-
-
-
-
-void Projekt::save_gnuplot3(double **roz, string nazwa, string rozsz ) {
+void Projekt::save_gnuplot_ogolne(double **roz, string nazwa, string rozsz ) {
 // wyliczenie bladow i zapis do plikow
 
 //plik z wartosciami bladow dla wszystkich wartosci z tablicy
 
-    FILE *ogolne, *maxb, *maxbwykr, *wykr2, *wykr3;
 
+
+    ofstream ogolne( "Ogolne_roz_"+nazwa + rozsz);
+    ofstream wykr2( "Wykres2_"+nazwa + rozsz);
+    ofstream wykr3( "Wykres3_"+nazwa + rozsz);
 
      //pliki do ktorych zostana zapisane odpowiednie dane
-    maxb = fopen("bladmax_laasonen.txt","w");
-    //maxb = fopen("bladmax_CN.txt","w");
-    maxbwykr = fopen("wbladmax_laasonen.txt","w");
-    //maxbwykr = fopen("bladmax_CN.csv","w");
-    wykr2 = fopen("wykres2laasonen.txt","w");
-    //wykr2 = fopen("wykres2CN.csv","w");
-    wykr3 = fopen("wykres3laasonen.txt","w");
-    //wykr3 = fopen("wykres3CN.csv","w");
 
-    ogolne = fopen("ogolne_CN.txt", "w");
+    //wykr2 = fopen(nazwa+rozsz,"w");
 
-    fprintf(ogolne, "Wartosci i bledy dla metody Cranka-Nicolson przy kroku przestrzennym %lf i czasowym %lf\n\n", h,
-            dt);
+    //wykr3 = fopen("wykres3laasonen.txt","w");
+
+
+    //ogolne = fopen("ogolne_CN.txt", "w");
+
+
+
     double dtt = dt, dxx = 1;
     for (int i = 1; i < ile_t; i++) {
         dxx = 1;
-        fprintf(ogolne, "\nczas: %.4lf\n", dtt);
+        ogolne<< "\nczas: "<< dtt<<endl;
+
         for (int j = 0; j < ile_x; j++) {
-            fprintf(ogolne, "x = %.4lf\t| obliczone: %.15lf\t| analityczne: %.15lf\t  | blad bezwzgl. = %.15lf\n",
-                    dxx, roz[i][j], rozwiazanieA[i][j], fabs(rozwiazanieA[i][j] - roz[i][j]));
+            ogolne<<dxx<<"\t"<<roz[i][j]<<"\t"<<rozwiazanieA[i][j]<<"\t"<<fabs(rozwiazanieA[i][j] - roz[i][j])<<endl;
             dxx += h;
         }
         dtt += dt;
     }
-    fclose(ogolne);
+    ogolne.close();
 
 
-    //maxb = fopen("bladmax_laasonen.txt","w");
-
-//Błędy maxymalne dla tmax w funkcji kroku przestrzennego
-
-
-
-
-    dxx = x_min;
-    double maxblad = 0;
-
-    //fprintf(maxb, "\nczas tmax: %d\n", t_max);
-printf("\nczas tmax: %d\n",t_max);
-    for (int j = 0; j < ile_x; j++) {
-        if (fabs(rozwiazanieA[ile_t - 1][j] - roz[ile_t - 1][j]) > maxblad)
-            maxblad = fabs(rozwiazanieA[ile_t - 1][j] - roz[ile_t - 1][j]);
-        dxx+=h;
-        fprintf(maxb, "%.4lf \t %.20lf\n", log10(fabs(dxx)), log10(maxblad));
-       // printf("h = %.4lf\tmax. blad bezwzgl. = %.20lf\n",log10(fabs(dxx)), log10(maxblad));//dxx,maxblad);
-        maxblad=0.0;
-    }
-    //fprintf(maxb, "h = %.4lf\tmax. blad bezwzgl. = %.20lf\n",h, maxblad);
-   // printf("h = %.4lf\tmax. blad bezwzgl. = %.20lf\n",h,maxblad);
-
-    //printf("h = %.4lf\tmax. blad bezwzgl. = %.20lf\n",dxx,maxblad);
-    fclose(maxb);
-
-
-
-
-
-
-
-// dxx=x_min, maxblad=0;
-//for(int j=0;j<ile_x;j++){
-//        if(fabs(rozwiazanieA[ile_t - 1][j] - roz[ile_t - 1][j])>maxblad) maxblad=fabs(rozwiazanieA[ile_t - 1][j] - roz[ile_t - 1][j]);
-//}
-//fprintf(maxbwykr,"%.3lf;%.20lf\n", h, maxblad);
-//
-//    fclose(maxbwykr);
-
-
-
-    maxblad=0,dtt=dt;
-
-    for(int i=1;i<ile_t;i++){
-        maxblad=0;
-        for(int j=0;j<ile_x;j++){
-            if(fabs(rozwiazanieA[i][j]-roz[i][j])>maxblad) maxblad=fabs(rozwiazanieA[i][j]-roz[i][j]);
-        }
-        fprintf(maxbwykr,"%.4lf \t %.15lf\n",dtt,maxblad);
-        dtt+=dt;
-    }
-
-    fclose(maxbwykr);
 
 
 
 //Wartosci analityczne i wyliczone dla kilku wartosci t
 
- dxx=x_min;
+
+dxx=x_min;
 for(int j=0;j<ile_x;j+=10){
-    fprintf(wykr2,"%.4lf\t%.15lf\t%.15lf\t%.15lf\t%.15lf\t%.15lf\t%.15lf\t%.15lf\t%.15lf\n",
-    dxx,rozwiazanieA[0][j],rozwiazanieA[50][j],rozwiazanieA[100][j],rozwiazanieA[400][j],rozwiazanieA[700][j],roz[1000][j],rozwiazanieA[1300][j],rozwiazanieA[ile_t-1][j]);
+    wykr2<<dxx<<"\t"<<rozwiazanieA[0][j]<<"\t"<<rozwiazanieA[50][j]<<"\t"<<rozwiazanieA[100][j]<<"\t"<<rozwiazanieA[400][j]<<"\t"<<rozwiazanieA[700][j]<<"\t"<<roz[1000][j]<<"\t"<<rozwiazanieA[1300][j]<<"\t"<<rozwiazanieA[ile_t-1][j]<<endl;
     dxx+=10*h;
 }
 
-    fclose(wykr2);
+    wykr2.close();
 
 
 
@@ -683,15 +589,46 @@ for(int j=0;j<ile_x;j+=10){
  //maxblad=0,dtt=dt;
 
 for(int i=1;i<ile_t;i++){
-    maxblad=0;
+    double   maxblad=0;
     for(int j=0;j<ile_x;j++){
         if(fabs(rozwiazanieA[i][j]-roz[i][j])>maxblad) maxblad=fabs(rozwiazanieA[i][j]-roz[i][j]);
     }
-    fprintf(wykr3,"%.4lf \t %.15lf\n",dtt,maxblad);
+    wykr3<<dtt<<"\t"<<maxblad<<endl;
     dtt+=dt;
 }
 
-    fclose(wykr3);
+    wykr3.close();
+
+
+}
+
+
+
+void Projekt::maxb(double **roz, double *xxx,double *bmaxxx,int i ) {
+
+
+//Błędy maxymalne dla tmax w funkcji kroku przestrzennego
+
+
+
+
+    double dxx = x_min;
+    double maxblad = 0;
+
+    //fprintf(maxb, "\nczas tmax: %d\n", t_max);
+    printf("\nczas tmax: %d\n", t_max);
+    for (int j = 0; j < ile_x; j++) {
+        if (fabs(rozwiazanieA[ile_t - 1][j] - roz[ile_t - 1][j]) > maxblad)
+            maxblad = fabs(rozwiazanieA[ile_t - 1][j] - roz[ile_t - 1][j]);
+        dxx += h;
+
+    }
+
+     //printf("h = %.4lf\tmax. blad bezwzgl. = %.20lf\n",h,maxblad);
+
+    xxx[i]=h;
+    bmaxxx[i]=maxblad;
+
 
 
 }
@@ -705,11 +642,7 @@ for(int i=1;i<ile_t;i++){
 
 
 
-
-
-
-
-void Projekt::saveA( double **roz,string nazwa )
+    void Projekt::save_macierz( double **roz,string nazwa )
 {
     fstream fl;
     fl.open(nazwa.c_str(), ios::out);
@@ -720,19 +653,11 @@ void Projekt::saveA( double **roz,string nazwa )
         return;
     }
 
-    using std::replace;
-    char str[50];
-
-    string s(str);
-
-    replace(s.begin(), s.end(), '.', ',');
-
 
 
     for (int i=0;i<ile_t;i++)
     {
 
-        //fl<<setw(15)<<l2s(t).c_str();
 
         for (int j=0 ; j<ile_x;j++)
         {
