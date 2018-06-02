@@ -24,22 +24,27 @@ public:
 Projekt(int ile_xx,bool zapis);
 ~Projekt(void){};
 
-
+    void alokuj(double **tablica,int N, int M);
     void rozwiaz_analityczne();
     //double** rozwiaz_analityczne();
     void warunek(double **roz);
     void save_gnuplot(double **roz, string nazwa );
-    void saveA_gnuplot2( string nazwa, string roz );
-    void rozwiaz_laasonen_thomasa();
+    //void saveA_gnuplot2( string nazwa, string roz );
 
+    void rozwiaz_laasonen_thomasa();
+    double** blad_bezwgl(double** blad, double **roz, double max_blad,string nazwa);
+    //double MaksymalnyBladDlaDanegoT(double **U);
 
     double **rozwiazanieT;
     double **rozwiazanieSOR;
     double **rozwiazanieA;
 
+    double **blad_T;
+    double **blad_SOR;
 
-    double *pozycja;
-    double *czas;
+
+    double  blad_max_T;
+    double  blad_max_SOR;
 
 
 
@@ -69,12 +74,17 @@ void rozwiaz_laasonen_SOR();
     void AlgorytmThomasa_macierz(double *nadDiag, double *Diag, double *podDiag, int n);
 
     void save_gnuplot2(double **roz,string nazwa, string rozsz);
-
+    void save_gnuplot3(double **roz,string nazwa, string rozsz);
     void SOR(double **A, double *B, double *X0, int n);
 
     double max(double *x, int n, double **A, double *b);
 
     double Estymator(double *x0, double *x1, int n);
+    void f_blad ();
+
+    void zapis_do_pliku_w(char *nazwa, double *wektor);
+
+    void saveA(double **roz, string nazwa);
 };
 
 

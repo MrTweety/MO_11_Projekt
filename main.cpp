@@ -22,9 +22,10 @@ int main() {
     Projekt proj(ile_iteracji,0);
     proj.rozwiaz_analityczne();
     proj.rozwiaz_laasonen_thomasa();
-    proj.rozwiaz_laasonen_SOR();
-
-
+    //proj.rozwiaz_laasonen_SOR();
+    proj.save_gnuplot3(proj.rozwiazanieT,"a","a");
+    proj.f_blad();
+    proj.saveA(proj.blad_T,"bladT.csv");
 
 
 //    Projekt proj(ile_iteracji,0);
