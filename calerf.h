@@ -2,10 +2,10 @@
 #define __calerf_h
 
 // -------- netlib package by J. W. Cody ---------
-double calerf(const double arg, const int jint);
-double erf(const double x);
-double erfc(const double x);
-double erex(const double x);
+long double CALERFL(const long double arg, const int jint);
+long double ERFL(const long double x);
+long double ERFCL(const long double x);
+long double EREXL(const long double x);
 // -----------------------------------------------
 
 #endif

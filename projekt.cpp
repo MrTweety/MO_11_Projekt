@@ -11,7 +11,7 @@ Projekt::Projekt(int ile_xx,bool zapis)
     t_max=2.0;
     alfa=1.0;
     beta=0.0;
-    // 1.
+    //
     x_min =-6.*sqrt(D*t_max)-1.0;
     x_max = -x_min;
     this->zapis=zapis;
@@ -19,17 +19,16 @@ Projekt::Projekt(int ile_xx,bool zapis)
 
     ile_x  = ile_xx;
 
-    // 2. obliczenie kroku h i dt
+    //  obliczenie kroku h i dt
     h  =  (x_max -x_min)/ (ile_x-1);
-
     dt = h * h;
-    //dt = t_max/(ile_t -1);
 
 
+    //liczba krokow t
     ile_t =(int)( t_max/dt +1);
 
-    dt = (t_max/(ile_t-1));
 
+    //lambda
     lambda = D * dt / (h*h);
 
     cout<<"ile_x = "<<ile_x<<"\tile_t = "<<ile_t<<"\nt_max = "<<t_max<<endl;
@@ -67,7 +66,9 @@ Projekt::Projekt(int ile_xx,bool zapis)
 void Projekt::warunek(double **roz)
 {
     double x ;
-    for( int i = 0; i < ile_x; i++ ){ //warunek poczatkowy
+
+    //warunek poczatkowy
+    for( int i = 0; i < ile_x; i++ ){
 
         x=h*(double)i+x_min;
 
@@ -83,7 +84,8 @@ void Projekt::warunek(double **roz)
 
     }
 
-    for( int i = 0; i < ile_t; i++ ) {// warunki brzegowe , dla kzdej chwili T - konkretna wartosc 1. i ostatniej zmiennej X
+    // warunki brzegowe , dla kzdej chwili T - konkretna wartosc 1. i ostatniej zmiennej X
+    for( int i = 0; i < ile_t; i++ ) {
         roz[i][0] = alfa;
         roz[i][ile_x-1] = beta;
 
@@ -95,7 +97,7 @@ void Projekt::warunek(double **roz)
 
 
 
-//double** Projekt::rozwiaz_analityczne()
+
 void Projekt::rozwiaz_analityczne()
 {
     double x,t;
@@ -187,6 +189,9 @@ void Projekt::rozwiaz_laasonen_thomasa(){
         save_gnuplot(rozwiazanieT, "rozwT.txt");
         save_gnuplot2(rozwiazanieT, "rozwT", ".txt");
         blad_bezwgl(blad_T,rozwiazanieT,blad_max_T,"bladT");
+        save_gnuplot(blad_T, "blad_T.txt");
+        save_macierz( blad_T ,"blad_T_macierz.csv" );
+        save_macierz( rozwiazanieT ,"rozwT_macierz.csv" );
     }
 
 }
@@ -251,11 +256,7 @@ void Projekt::rozwiaz_laasonen_SOR(){
     for (int i=0;i<ile_x;i++)
         A[i] = new double[ile_x];//macierz trojdiagonalna
 
-//    for (int i=0;i<ile_x;i++) {
-//        X0[i] = 0.0;
-//        for (int j = 0; i < ile_x; j++)
-//            A[i][j] = 0.0;
-//    }
+
 
 
     A[1][0]=lambda;
@@ -274,7 +275,7 @@ void Projekt::rozwiaz_laasonen_SOR(){
     {
 
 
-        b[0] =  alfa ;
+        b[0] =  2*alfa ;
         for( int i = 1; i < ile_x-1; i++ )//wypelnianie macierzy i
             b[i] = -rozwiazanieSOR[k-1][i];
         b[ile_x-1] = beta ;
@@ -289,6 +290,9 @@ void Projekt::rozwiaz_laasonen_SOR(){
         save_gnuplot(rozwiazanieSOR, "rozwSOR.txt");
         save_gnuplot2(rozwiazanieSOR, "rozwSOR", ".txt");
         blad_bezwgl(blad_SOR,rozwiazanieSOR,blad_max_SOR,"bladSOR");
+        save_gnuplot(blad_SOR, "blad_SOR.txt");
+        save_macierz( blad_SOR ,"blad_SOR_macierz.csv" );
+        save_macierz( rozwiazanieSOR ,"rozwSOR_macierz.csv" );
     }
 
 
@@ -396,44 +400,10 @@ double** Projekt::blad_bezwgl(double** blad, double **roz, double max_blad,strin
         }
         if(blad[ile_t-1][j]>max_blad)
             max_blad = blad[ile_t-1][j]; //blad bezwzgledny
-            //cout<<max_blad<<endl;
-            //max_blad=0.0;
+
     }
 
-    //if(zapis) {
-      // save_gnuplot(roz, nazwa+".csv");
-       //save_gnuplot2(roz, nazwa, ".txt");
-   // }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -538,15 +508,6 @@ void Projekt::save_gnuplot_ogolne(double **roz, string nazwa, string rozsz ) {
     ofstream wykr2( "Wykres2_"+nazwa + rozsz);
     ofstream wykr3( "Wykres3_"+nazwa + rozsz);
 
-     //pliki do ktorych zostana zapisane odpowiednie dane
-
-    //wykr2 = fopen(nazwa+rozsz,"w");
-
-    //wykr3 = fopen("wykres3laasonen.txt","w");
-
-
-    //ogolne = fopen("ogolne_CN.txt", "w");
-
 
 
     double dtt = dt, dxx = 1;
@@ -571,7 +532,9 @@ void Projekt::save_gnuplot_ogolne(double **roz, string nazwa, string rozsz ) {
 
 dxx=x_min;
 for(int j=0;j<ile_x;j+=10){
-    wykr2<<dxx<<"\t"<<rozwiazanieA[0][j]<<"\t"<<rozwiazanieA[50][j]<<"\t"<<rozwiazanieA[100][j]<<"\t"<<rozwiazanieA[400][j]<<"\t"<<rozwiazanieA[700][j]<<"\t"<<roz[1000][j]<<"\t"<<rozwiazanieA[1300][j]<<"\t"<<rozwiazanieA[ile_t-1][j]<<endl;
+    //wykr2<<dxx<<"\t"<<rozwiazanieA[50][j]<<"\t"<<roz[50][j]<<"\t"<<rozwiazanieA[50][j]<<"\t"<<rozwiazanieA[100][j]<<"\t"<<roz[100][j]<<"\t"<<rozwiazanieA[400][j]<<"\t"<<roz[400][j]<<"\t"<<rozwiazanieA[700][j]<<"\t"<<roz[700][j]<<"\t"<<rozwiazanieA[1000][j]<<"\t"<<roz[1000][j]<<"\t"<<rozwiazanieA[1300][j]<<"\t"<<roz[1300][j]<<"\t"<<rozwiazanieA[ile_t-1][j]<<"\t"<<roz[ile_t-1][j]<<endl;
+
+    wykr2<<dxx<<"\t"<<rozwiazanieA[50][j]<<"\t"<<roz[50][j]<<"\t"<<rozwiazanieA[50][j]<<"\t"<<rozwiazanieA[100][j]<<"\t"<<roz[100][j]<<"\t"<<rozwiazanieA[150][j]<<"\t"<<roz[150][j]<<"\t"<<rozwiazanieA[200][j]<<"\t"<<roz[200][j]<<"\t"<<rozwiazanieA[250][j]<<"\t"<<roz[250][j]<<"\t"<<rozwiazanieA[300][j]<<"\t"<<roz[300][j]<<"\t"<<rozwiazanieA[ile_t-1][j]<<"\t"<<roz[ile_t-1][j]<<endl;
     dxx+=10*h;
 }
 
@@ -584,11 +547,12 @@ for(int j=0;j<ile_x;j+=10){
 
 //Błędy maksymalne w funkcji czasu t
 
-    //DOBRZE
 
- //maxblad=0,dtt=dt;
 
-for(int i=1;i<ile_t;i++){
+    //double maxblad=0; dtt=dt;
+
+    double maxblad=0; dtt=0;
+for(int i=0;i<ile_t;i++){
     double   maxblad=0;
     for(int j=0;j<ile_x;j++){
         if(fabs(rozwiazanieA[i][j]-roz[i][j])>maxblad) maxblad=fabs(rozwiazanieA[i][j]-roz[i][j]);
@@ -610,8 +574,6 @@ void Projekt::maxb(double **roz, double *xxx,double *bmaxxx,int i ) {
 //Błędy maxymalne dla tmax w funkcji kroku przestrzennego
 
 
-
-
     double dxx = x_min;
     double maxblad = 0;
 
@@ -624,19 +586,12 @@ void Projekt::maxb(double **roz, double *xxx,double *bmaxxx,int i ) {
 
     }
 
-     //printf("h = %.4lf\tmax. blad bezwzgl. = %.20lf\n",h,maxblad);
-
     xxx[i]=h;
     bmaxxx[i]=maxblad;
 
 
 
 }
-
-
-
-
-
 
 
 
