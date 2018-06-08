@@ -5,21 +5,13 @@
 #include <ctime>
 
 
-
-void czekaj( int iSekundy )
-{
-    for( clock_t koniec = clock() + iSekundy * CLOCKS_PER_SEC; clock() < koniec; )
-        continue;
-
-}
-
 double *xxxT, *bmaxxxT;
 double *xxxS,*bmaxxxS;
 
 
 int main() {
 
-    std::cout << "Hello, World!" << std::endl;
+    std::cout << "Mateusz Gaczorek\n" << std::endl;
 
 
 
@@ -30,25 +22,16 @@ int main() {
 
 
 
-//    int i=5;
-//
-//
-//
-
-    int ile_iteracji = pow(2.0, i + 4);
 
 
 
-    Projekt proj(ile_iteracji, 1);
+    int i = 4;
+    int ile_x = pow(2, i + 4);
+
+    Projekt proj(ile_x, 1);
     proj.rozwiaz_analityczne();
     proj.rozwiaz_laasonen_thomasa();
     proj.rozwiaz_laasonen_SOR();
-    proj.save_gnuplot_ogolne(proj.rozwiazanieT,"laasonen_thomasa",".txt");
-    proj.save_gnuplot_ogolne(proj.rozwiazanieSOR,"laasonen_SOR",".txt");
-
-
-
-
 
 
 
@@ -61,7 +44,7 @@ int main() {
     //*************************************************//
 
 
-//
+
 //    int count =6;
 //    int i=count;
 //    int liczba=50;
@@ -81,12 +64,12 @@ int main() {
 //    for ( i =0 ; i < count ; i++) {
 //
 //        cout<<"i==="<<i<<endl;
-//         //ile_iteracji += 300;
-//        int ile_iteracji = pow(2.0, i+ 4);
+//         //ile_x += 300;
+//        int ile_x = pow(2.0, i+ 4);
 //
 //
 //
-//        Projekt proj(ile_iteracji, 0);
+//        Projekt proj(ile_x, 0);
 //        proj.rozwiaz_analityczne();
 //        proj.rozwiaz_laasonen_thomasa();
 //        proj.rozwiaz_laasonen_SOR();
@@ -114,9 +97,9 @@ int main() {
     //*******obliczanie czasu działąnia algorytmu******//
     //*************************************************//
 
-//    int i=4;
-//    int ile_iteracji = pow(2.0, i + 4);
-//    Projekt proj(ile_iteracji,0);
+//    int i=5;
+//    int ile_x = pow(2, i + 4);
+//    Projekt proj(ile_x,0);
 //    proj.rozwiaz_analityczne();
 //
 //    time_t czasStart = time( NULL );
@@ -133,7 +116,7 @@ int main() {
 //    printf( "Uplynelo %.2fsek.\n", difftime( czasStop, czasStart ) );
 //
 //    printf( "czasSOR-czasT %.2fsek.\n", czasSOR-czasT );
-//
+
     std::cout << "END" << std::endl;
     return 0;
 }

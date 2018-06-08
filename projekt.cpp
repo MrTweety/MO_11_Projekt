@@ -57,43 +57,28 @@ Projekt::Projekt(int ile_xx,bool zapis)
         blad_SOR[i] = new double[ile_x];
 
 
-
-
 }
 
 
 
-void Projekt::warunek(double **roz)
-{
+void Projekt::warunek(double **roz) {
     double x ;
 
     //warunek poczatkowy
     for( int i = 0; i < ile_x; i++ ){
-
         x=h*(double)i+x_min;
-
-
         if (x>=0)
             roz[0][i] = 0.0;
-
         else if   (x<0)
             roz[0][i] = 1.0;
-
-
-
-
     }
 
     // warunki brzegowe , dla kzdej chwili T - konkretna wartosc 1. i ostatniej zmiennej X
     for( int i = 0; i < ile_t; i++ ) {
         roz[i][0] = alfa;
         roz[i][ile_x-1] = beta;
-
-
     }
-
 }
-
 
 
 
@@ -122,15 +107,13 @@ void Projekt::rozwiaz_analityczne()
         x=x_min+h;
         t+=dt;
 
-
     }
-    if(zapis) {
+
+    if(zapis){
         save_gnuplot(rozwiazanieA, "rozwA.txt");
-        save_gnuplot2(rozwiazanieA, "rozwA", ".txt");
+        save_gnuplot_w2(rozwiazanieA, "rozwA", ".txt");
     }
 }
-
-
 
 
 
@@ -160,11 +143,8 @@ void Projekt::rozwiaz_laasonen_thomasa(){
 
     Diag[ile_x-1]=1.0;
 
-
-    //pierwszy etap alg Thomassa - zerowanie podprzekatnej:
-
+    //pierwszy etap alg Thomassa - zerowanie macierzy L:
     AlgorytmThomasa_macierz( nadDiag,  Diag,  podDiag, ile_x);
-
 
     // przebieg czasowy:
     for( int k = 1; k < ile_t; k++ ) {
@@ -176,6 +156,7 @@ void Projekt::rozwiaz_laasonen_thomasa(){
 
         b[ile_x-1] = beta ;
 
+        //Rozwiazanie alg Thomassa
         AlgorytmThomasa_rozwiazanie(nadDiag,  Diag, podDiag, b, ile_x, wyn);
 
 
@@ -183,11 +164,11 @@ void Projekt::rozwiaz_laasonen_thomasa(){
         for( int i = 1; i < ile_x-1; i++ )
             rozwiazanieT[k][i] = wyn[i];
 
-
     }
     if(zapis) {
         save_gnuplot(rozwiazanieT, "rozwT.txt");
-        save_gnuplot2(rozwiazanieT, "rozwT", ".txt");
+        save_gnuplot_w2(rozwiazanieT, "rozwT", ".txt");
+        save_gnuplot_w3(rozwiazanieT,"laasonen_thomasa",".txt");
         blad_bezwgl(blad_T,rozwiazanieT,blad_max_T,"bladT");
         save_gnuplot(blad_T, "blad_T.txt");
         save_macierz( blad_T ,"blad_T_macierz.csv" );
@@ -202,11 +183,8 @@ void Projekt::AlgorytmThomasa_macierz(double *nadDiag, double *Diag, double *pod
     double l;
     int i;
 
-    for (i = 1; i < n; i++)
-    {
-        //l = podDiag[i - 1] / Diag[i - 1];
+    for (i = 1; i < n; i++) {
         Diag[i] = Diag[i] - (podDiag[i - 1] / Diag[i - 1]) * nadDiag[i - 1];//wyliczamy eta[i]
-
     }
 }
 
@@ -215,9 +193,8 @@ void Projekt::AlgorytmThomasa_rozwiazanie(double *nadDiag, double *Diag, double 
     double l;
     int i;
 
-    for (i = 1; i < n; i++)
-    {
-        //l = podDiag[i - 1] / Diag[i - 1];
+    for (i = 1; i < n; i++) {
+
         B[i] = B[i] - (podDiag[i - 1] / Diag[i - 1])* B[i - 1];//wyliczamy r[i]
     }
 
@@ -233,8 +210,6 @@ void Projekt::rozwiaz_laasonen_SOR(){
     double *b = new double[ile_x];
    // double *wyn = new double[ile_x];
     double *X0 = new double[ile_x];//przyblizenie pcozatkowe [0,0,...0,0]
-
-
 
     x = x_min;
     for( int i = 0; i < ile_x; i++ ){ //warunek poczatkowy
@@ -271,10 +246,7 @@ void Projekt::rozwiaz_laasonen_SOR(){
     A[ile_x-1][ile_x-1] = 1.0;
 
     //przebieg czasowy
-    for( int k = 1; k < ile_t; k++ )
-    {
-
-
+    for( int k = 1; k < ile_t; k++ ) {
         b[0] =  2*alfa ;
         for( int i = 1; i < ile_x-1; i++ )//wypelnianie macierzy i
             b[i] = -rozwiazanieSOR[k-1][i];
@@ -288,14 +260,13 @@ void Projekt::rozwiaz_laasonen_SOR(){
 
     if(zapis) {
         save_gnuplot(rozwiazanieSOR, "rozwSOR.txt");
-        save_gnuplot2(rozwiazanieSOR, "rozwSOR", ".txt");
+        save_gnuplot_w2(rozwiazanieSOR, "rozwSOR", ".txt");
+        save_gnuplot_w3(rozwiazanieSOR,"laasonen_SOR",".txt");
         blad_bezwgl(blad_SOR,rozwiazanieSOR,blad_max_SOR,"bladSOR");
         save_gnuplot(blad_SOR, "blad_SOR.txt");
         save_macierz( blad_SOR ,"blad_SOR_macierz.csv" );
         save_macierz( rozwiazanieSOR ,"rozwSOR_macierz.csv" );
     }
-
-
 }
 
 
@@ -338,12 +309,11 @@ void Projekt::SOR(double **A, double *B, double *X0, int n) {
 }
 
 
-
+//Reziduum metody sor - norma maksimum
+// Wiarygodność Xn jako Przyblizenia pierwiastka
 double Projekt::max(double *x, int n, double **A,double *b) {
 
-
     double *Res = new double[n];//r=||Ax-b||
-
 
     for (int i = 0; i < n; ++i) {
         Res[i] = 0;
@@ -362,7 +332,11 @@ double Projekt::max(double *x, int n, double **A,double *b) {
 
     return max;
 }
+
+
 //********************************************************************
+// Estymator błedu dala metody sor - norma maksimum
+//dokładnosc wyznaczenia Xn
 double Projekt::Estymator(double *x0, double *x1, int n) {
 
     for (int i = 0; i < n; ++i)
@@ -378,33 +352,17 @@ double Projekt::Estymator(double *x0, double *x1, int n) {
 
 
 
-
-
-
-
-
-double** Projekt::blad_bezwgl(double** blad, double **roz, double max_blad,string nazwa)
-{
+double** Projekt::blad_bezwgl(double** blad, double **roz, double max_blad,string nazwa) {
     max_blad=0.0;
-    //double x = x_min,t = 0.0;
 
-
-
-
-    for (int j = 0; j < ile_x; j++)
-    {
-        for (int i = 0; i < ile_t ; i++)
-        {
+    for (int j = 0; j < ile_x; j++) {
+        for (int i = 0; i < ile_t ; i++) {
             blad[i][j] = fabs(rozwiazanieA[i][j] - roz[i][j]);
-
         }
         if(blad[ile_t-1][j]>max_blad)
             max_blad = blad[ile_t-1][j]; //blad bezwzgledny
-
     }
-
 }
-
 
 
 
@@ -443,8 +401,6 @@ void Projekt::save_gnuplot( double **roz,string nazwa )
 
     }
 
-
-
     fl.close();
     cout<<"Zapisano do pliku :  \""<<nazwa.c_str()<<"\""<<endl;
 
@@ -452,7 +408,8 @@ void Projekt::save_gnuplot( double **roz,string nazwa )
 
 
 
-void Projekt::save_gnuplot2(double **roz, string nazwa, string rozsz )
+
+void Projekt::save_gnuplot_w2(double **roz, string nazwa, string rozsz )
 {
 
     double t,x;
@@ -464,7 +421,7 @@ void Projekt::save_gnuplot2(double **roz, string nazwa, string rozsz )
     t=0.0;
     for (int i=0;i<ile_t;i++,t=dt*i)
     {
-        if(i==0|| i==50 || i==100|| i==400|| i==700 || i==1000 || i==1300 || i==ile_t-1) {
+        if(i==0|| i==50 || i==100|| i==150|| i==200 || i==250 || i==300 || i==ile_t-1) {
 
             cout<<"i="<<i<<"\tt= "<<t<<endl;
             string nazwa2 = nazwa + to_string(i) + rozsz;
@@ -477,7 +434,7 @@ void Projekt::save_gnuplot2(double **roz, string nazwa, string rozsz )
             }
 
 
-            for (int j = 0; j < ile_x; j++, x = x_min + h * j) {
+            for (int j = 0; j < ile_x; j=j+4, x = x_min + h * j) {
 
                 //fl << t << "\t" << log10(fabs(x)) << "\t" << log10(roz[i][j]) << endl;
                 fl << t << "\t" << x << "\t" << roz[i][j] << endl;
@@ -495,85 +452,33 @@ void Projekt::save_gnuplot2(double **roz, string nazwa, string rozsz )
 
 
 
+void Projekt::save_gnuplot_w3(double **roz, string nazwa, string rozsz ) {
 
-
-void Projekt::save_gnuplot_ogolne(double **roz, string nazwa, string rozsz ) {
-// wyliczenie bladow i zapis do plikow
-
-//plik z wartosciami bladow dla wszystkich wartosci z tablicy
-
-
-
-    ofstream ogolne( "Ogolne_roz_"+nazwa + rozsz);
-    ofstream wykr2( "Wykres2_"+nazwa + rozsz);
     ofstream wykr3( "Wykres3_"+nazwa + rozsz);
 
 
-
-    double dtt = dt, dxx = 1;
-    for (int i = 1; i < ile_t; i++) {
-        dxx = 1;
-        ogolne<< "\nczas: "<< dtt<<endl;
-
-        for (int j = 0; j < ile_x; j++) {
-            ogolne<<dxx<<"\t"<<roz[i][j]<<"\t"<<rozwiazanieA[i][j]<<"\t"<<fabs(rozwiazanieA[i][j] - roz[i][j])<<endl;
-            dxx += h;
-        }
-        dtt += dt;
-    }
-    ogolne.close();
-
-
-
-
-
-//Wartosci analityczne i wyliczone dla kilku wartosci t
-
-
-dxx=x_min;
-for(int j=0;j<ile_x;j+=10){
-    //wykr2<<dxx<<"\t"<<rozwiazanieA[50][j]<<"\t"<<roz[50][j]<<"\t"<<rozwiazanieA[50][j]<<"\t"<<rozwiazanieA[100][j]<<"\t"<<roz[100][j]<<"\t"<<rozwiazanieA[400][j]<<"\t"<<roz[400][j]<<"\t"<<rozwiazanieA[700][j]<<"\t"<<roz[700][j]<<"\t"<<rozwiazanieA[1000][j]<<"\t"<<roz[1000][j]<<"\t"<<rozwiazanieA[1300][j]<<"\t"<<roz[1300][j]<<"\t"<<rozwiazanieA[ile_t-1][j]<<"\t"<<roz[ile_t-1][j]<<endl;
-
-    wykr2<<dxx<<"\t"<<rozwiazanieA[50][j]<<"\t"<<roz[50][j]<<"\t"<<rozwiazanieA[50][j]<<"\t"<<rozwiazanieA[100][j]<<"\t"<<roz[100][j]<<"\t"<<rozwiazanieA[150][j]<<"\t"<<roz[150][j]<<"\t"<<rozwiazanieA[200][j]<<"\t"<<roz[200][j]<<"\t"<<rozwiazanieA[250][j]<<"\t"<<roz[250][j]<<"\t"<<rozwiazanieA[300][j]<<"\t"<<roz[300][j]<<"\t"<<rozwiazanieA[ile_t-1][j]<<"\t"<<roz[ile_t-1][j]<<endl;
-    dxx+=10*h;
-}
-
-    wykr2.close();
-
-
-
-
-
+    double dtt = dt;
 
 //Błędy maksymalne w funkcji czasu t
-
-
-
-    //double maxblad=0; dtt=dt;
+    cout<<"Zapisano do pliku :  "<< "Wykres3_"<<nazwa << rozsz <<"\""<<endl;
 
     double maxblad=0; dtt=0;
-for(int i=0;i<ile_t;i++){
-    double   maxblad=0;
-    for(int j=0;j<ile_x;j++){
-        if(fabs(rozwiazanieA[i][j]-roz[i][j])>maxblad) maxblad=fabs(rozwiazanieA[i][j]-roz[i][j]);
+    for(int i=0;i<ile_t;i++){
+        double   maxblad=0;
+        for(int j=0;j<ile_x;j++){
+            if(fabs(rozwiazanieA[i][j]-roz[i][j])>maxblad) maxblad=fabs(rozwiazanieA[i][j]-roz[i][j]);
+        }
+        wykr3<<dtt<<"\t"<<maxblad<<endl;
+        dtt+=dt;
     }
-    wykr3<<dtt<<"\t"<<maxblad<<endl;
-    dtt+=dt;
-}
 
     wykr3.close();
-
-
 }
 
 
 
 void Projekt::maxb(double **roz, double *xxx,double *bmaxxx,int i ) {
-
-
 //Błędy maxymalne dla tmax w funkcji kroku przestrzennego
-
-
     double dxx = x_min;
     double maxblad = 0;
 
@@ -583,39 +488,25 @@ void Projekt::maxb(double **roz, double *xxx,double *bmaxxx,int i ) {
         if (fabs(rozwiazanieA[ile_t - 1][j] - roz[ile_t - 1][j]) > maxblad)
             maxblad = fabs(rozwiazanieA[ile_t - 1][j] - roz[ile_t - 1][j]);
         dxx += h;
-
     }
 
     xxx[i]=h;
     bmaxxx[i]=maxblad;
-
-
-
 }
 
 
-
-
-
-    void Projekt::save_macierz( double **roz,string nazwa )
-{
+    void Projekt::save_macierz( double **roz,string nazwa ) {
     fstream fl;
     fl.open(nazwa.c_str(), ios::out);
-    if (!fl.is_open())
-    {
+    if (!fl.is_open()) {
         cout<<"Blad otwierania pliku!"<<endl;
         system("pause");
         return;
     }
 
 
-
-    for (int i=0;i<ile_t;i++)
-    {
-
-
-        for (int j=0 ; j<ile_x;j++)
-        {
+    for (int i=0;i<ile_t;i++) {
+        for (int j=0 ; j<ile_x;j++){
             char str[50];
             sprintf(str,"%lf",(double)roz[i][j]);
             string s(str);
@@ -626,8 +517,6 @@ void Projekt::maxb(double **roz, double *xxx,double *bmaxxx,int i ) {
 
         fl<<endl;
     }
-
-
 
     fl.close();
     cout<<"Zapisano do pliku :  \""<<nazwa.c_str()<<"\""<<endl;

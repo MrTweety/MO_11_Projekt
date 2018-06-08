@@ -7,33 +7,18 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 #include <fstream>
 #include <iomanip>
-#include <algorithm>
+#include <algorithm> //replace
 using namespace std;
-
 
 class Projekt{
 
 public:
-
-Projekt(int ile_xx,bool zapis);
-~Projekt(void){};
-
-    void alokuj(double **tablica,int N, int M);
-    void rozwiaz_analityczne();
-    //double** rozwiaz_analityczne();
-    void warunek(double **roz);
-    void save_gnuplot(double **roz, string nazwa );
-    //void saveA_gnuplot2( string nazwa, string roz );
-
-    void rozwiaz_laasonen_thomasa();
-    double** blad_bezwgl(double** blad, double **roz, double max_blad,string nazwa);
-    //double MaksymalnyBladDlaDanegoT(double **U);
 
     double **rozwiazanieT;
     double **rozwiazanieSOR;
@@ -41,52 +26,46 @@ Projekt(int ile_xx,bool zapis);
 
     double **blad_T;
     double **blad_SOR;
-
-
     double  blad_max_T;
     double  blad_max_SOR;
 
+    int ile_t;
+    int ile_x;
 
-
-int ile_t;
-int ile_x;
-
-double alfa;
-double beta;
-
-double lambda;
-double h;
-double dt;
-
-double D;
-double x_min;
-double x_max;
-
-double t_max;
+    double alfa;
+    double beta;
+    double lambda;
+    double h;
+    double dt;
+    double D;
+    double x_min;
+    double x_max;
+    double t_max;
     bool zapis;
 
 
-void rozwiaz_laasonen_SOR();
+
+    Projekt(int ile_xx,bool zapis);
+    ~Projekt(void){};
 
 
+    void rozwiaz_analityczne();
+    void warunek(double **roz);
+    void rozwiaz_laasonen_thomasa();
+    void AlgorytmThomasa_macierz(double *nadDlag, double *Diag, double *podDiag, int n);
     void AlgorytmThomasa_rozwiazanie(double *nadDiag, double *Diag, double *podDiag, double *B, int n, double *X);
-
-    void AlgorytmThomasa_macierz(double *nadDiag, double *Diag, double *podDiag, int n);
-
-    void save_gnuplot2(double **roz,string nazwa, string rozsz);
-    void save_gnuplot_ogolne(double **roz,string nazwa, string rozsz);
+    void rozwiaz_laasonen_SOR();
     void SOR(double **A, double *B, double *X0, int n);
-
     double max(double *x, int n, double **A, double *b);
-
     double Estymator(double *x0, double *x1, int n);
-
-
-
+    double** blad_bezwgl(double** blad, double **roz, double max_blad,string nazwa);
+    void save_gnuplot_w3(double **roz,string nazwa, string rozsz);
+    void maxb(double **roz,  double *tablica, double *tablica2, int i);
     void save_macierz(double **roz, string nazwa);
 
-    void maxb(double **roz,  double *tablica, double *tablica2, int i);
-};
+    void save_gnuplot_w2(double **roz, string nazwa, string rozsz);
 
+    void save_gnuplot(double **roz, string nazwa);
+};
 
 #endif //MO_11_PROJEKT_PROJEKT_H
